@@ -9,6 +9,11 @@ export default defineConfig({
       color:{
         primary:"#5f6FFF",
       }
+    },
+     build: {
+    rollupOptions: {
+      external: ['react-router-dom']
     }
+  }
   }
 })
