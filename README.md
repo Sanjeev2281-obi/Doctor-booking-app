@@ -1,12 +1,44 @@
-# React + Vite
+# 🩺 Doctor Appointment Booking System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive doctor booking platform where users can sign up, view available doctors, book appointments, manage their profile, and more — built using **React**, **Tailwind CSS**, and **localStorage** (no backend).
 
-Currently, two official plugins are available:
+## 🌐 Live Demo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+👉 [Click here to visit the live site](https://doctor-booking-app22.vercel.app/)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📸 Screenshots
+
+### Home Page
+![Home Page](![Screenshot 2025-07-02 175714](https://github.com/user-attachments/assets/c06106c2-57fc-47d2-9c6d-4e23da624219)
+
+)
+
+---
+
+## ⚙️ Features
+
+- 👤 **User Authentication** (via localStorage)
+- 👨‍⚕️ View list of doctors with specialization
+- 📅 Book & cancel appointments
+- 📄 Patient and Doctor dashboards
+- 🔐 My Profile (with editable fields)
+- 📱 Fully responsive (Mobile + Desktop)
+- ☁️ Hosted on Netlify
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React, React Router DOM, Tailwind CSS
+- **State Management:** React Hooks
+- **Routing:** React Router
+- **Data Storage:** localStorage
+- **Build Tool:** Vite
+- **Deployment:** Netlify
+
+---
+
+## 📁 Folder Structure
+
