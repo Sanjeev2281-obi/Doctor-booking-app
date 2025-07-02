@@ -22,7 +22,7 @@ A responsive doctor booking platform where users can sign up, view available doc
 - 👤 **User Authentication** (via localStorage)
 - 👨‍⚕️ View list of doctors with specialization
 - 📅 Book & cancel appointments
-- 📄 Patient and Doctor dashboards
+- 📄 Patient dashboards
 - 🔐 My Profile (with editable fields)
 - 📱 Fully responsive (Mobile + Desktop)
 - ☁️ Hosted on Netlify
