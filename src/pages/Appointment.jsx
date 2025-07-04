@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import assets from '../assets/assets'
 import { AppContext } from '../context/AppContext'
 import RelatedDoctor from '../components/RelatedDoctor'
-
+import { useNavigate } from 'react-router-dom'
 function Appointment() {
     const { docId } = useParams()
     const { doctors, currency } = useContext(AppContext)
@@ -12,6 +12,8 @@ function Appointment() {
     const [docSlot, setDocSlot] = useState([])
     const [slotIndex, setSlotIndex] = useState(0)
     const [slotTime, setSlotTime] = useState("")
+    const [isAuthenticated, setIsAuthenticated] = useState(null);
+    const navigate = useNavigate();
 
     const getAvailableSlots = () => {
 
@@ -52,6 +54,10 @@ function Appointment() {
         setDocInfo(doc)
     }, [docId, doctors])
 
+
+
+
+
     useEffect(() => {
         if (docInfo) {
             getAvailableSlots()
@@ -62,26 +68,36 @@ function Appointment() {
         console.log(docSlot)
     }, [docSlot])
     const handleBooking = () => {
-  if (!slotTime) {
-    alert("Please select a slot");
-    return;
-  }
+        const user = JSON.parse(localStorage.getItem("loggedInUser"));
+        if (!user || !user.email) {
+            alert("You must be logged in to book an appointment.");
+            navigate("/login");
+            return;
+        }
+        if (!slotTime) {
+            alert("Please select a slot");
+            return;
+        }
+        if (!docSlot[slotIndex] || !docSlot[slotIndex][0]) {
+            alert("No slot selected");
+            return;
+        }
+        const appointment = {
+            doctorId: docInfo._id,
+            doctorName: docInfo.name,
+            doctorImage: docInfo.image,
+            date: docSlot[slotIndex][0].datetime.toDateString(),
+            time: slotTime,
+            status: "unpaid", // You can also add status for payment
+        };
 
-  const appointment = {
-    doctorId: docInfo._id,
-    doctorName: docInfo.name,
-    doctorImage: docInfo.image,
-    date: docSlot[slotIndex][0].datetime.toDateString(),
-    time: slotTime,
-    status: "unpaid", // You can also add status for payment
-  };
+        const existingAppointments = JSON.parse(localStorage.getItem("appointments")) || [];
+        existingAppointments.push(appointment);
+        localStorage.setItem("appointments", JSON.stringify(existingAppointments));
 
-  const existingAppointments = JSON.parse(localStorage.getItem("appointments")) || [];
-  existingAppointments.push(appointment);
-  localStorage.setItem("appointments", JSON.stringify(existingAppointments));
+        alert("Appointment Booked!");
+    };
 
-  alert("Appointment Booked!");
-};
 
     return docInfo && (
         <>

@@ -5,13 +5,16 @@ import '../index.css'
 
 function Navbar() {
   const navi = useNavigate();
-  const [token, setToken] = useState(true);
+  const [token, setToken] = useState(false);
   const [show, setShow] = useState(false);
   const [dropdown, setDropdown] = useState(false);
 
   const dropdownRef = useRef(null);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    setToken(!!user);
+  }, []);
 
-  // Close dropdown when clicked outside
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -28,7 +31,7 @@ function Navbar() {
     <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400 px-4">
       <img onClick={() => navi('/')} className="w-44 cursor-pointer" src={assets.logo} alt="Logo" />
 
-      {/* Desktop Navigation */}
+
       <ul className="hidden md:flex items-center gap-6 font-semibold">
         <NavLink to="/"><li className="py-1">HOME</li></NavLink>
         <NavLink to="/doctors"><li className="py-1 text-primary">ALL DOCTOR</li></NavLink>
@@ -40,7 +43,7 @@ function Navbar() {
         {
           token ? (
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => setDropdown(!dropdown)}>
-              <img className="w-8 rounded-full" src={assets.profile_pic} alt="Profile" />
+              <img className="w-8 rounded-full" src="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg" alt="Profile" />
               <img className="w-2.5" src={assets.dropdown_icon} alt="Dropdown" />
             </div>
           ) : (
@@ -50,12 +53,22 @@ function Navbar() {
           )
         }
 
-        {/* Dropdown (click-based, works on mobile + desktop) */}
+      
         {dropdown && token && (
           <div className="absolute top-12 right-0 bg-white shadow-md rounded text-gray-700 font-medium z-50 min-w-48 p-4 flex flex-col gap-3">
             <p onClick={() => { setDropdown(false); navi('/my-profile') }} className="cursor-pointer hover:text-black">My Profile</p>
             <p onClick={() => { setDropdown(false); navi('/my-appointment') }} className="cursor-pointer hover:text-black">My Appointment</p>
-            <p onClick={() => { setToken(false); setDropdown(false); navi('/') }} className="cursor-pointer hover:text-black">Logout</p>
+            <p
+              onClick={() => {
+                localStorage.removeItem("loggedInUser");
+                setToken(false);
+                setShow(false);
+                navi('/');
+              }}
+              className="cursor-pointer hover:text-black"
+            >
+              Logout
+            </p>
           </div>
         )}
 
@@ -78,7 +91,17 @@ function Navbar() {
               <>
                 <p onClick={() => { setShow(false); navi('/my-profile') }} className="px-4 py-2 cursor-pointer">My Profile</p>
                 <p onClick={() => { setShow(false); navi('/my-appointment') }} className="px-4 py-2 cursor-pointer">My Appointment</p>
-                <p onClick={() => { setToken(false); setShow(false); navi('/') }} className="px-4 py-2 cursor-pointer">Logout</p>
+                <p
+                  onClick={() => {
+                    localStorage.removeItem("loggedInUser");
+                    setToken(false);
+                    setShow(false);
+                    navi('/');
+                  }}
+                  className="px-1 py-2 cursor-pointer"
+                >
+                  Logout
+                </p>
               </>
             )}
           </ul>
