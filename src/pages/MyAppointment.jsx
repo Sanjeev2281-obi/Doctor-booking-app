@@ -1,12 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import assets from '../assets/assets';
 
 function MyAppointment() {
   const [appointments, setAppointments] = useState([]);
 
+  const fetchAppointments = async () => {
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (!user || !user.email) return;
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/appointments/${user.email}`);
+      const data = await res.json();
+      setAppointments(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCancel = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/appointments/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        alert("Appointment cancelled!");
+        fetchAppointments(); // refresh list
+      } else {
+        alert("Failed to cancel!");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("appointments")) || [];
-    setAppointments(data);
+    fetchAppointments();
   }, []);
 
   return (
@@ -16,11 +43,8 @@ function MyAppointment() {
       {appointments.length === 0 ? (
         <p className="text-sm text-gray-600 mt-4">No appointments booked yet.</p>
       ) : (
-        appointments.map((item, index) => (
-          <div
-            className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b border-gray-300"
-            key={index}
-          >
+        appointments.map((item) => (
+          <div key={item.id} className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b border-gray-300">
             <div>
               <img className="bg-indigo-50 w-32" src={item.doctorImage} alt="" />
             </div>
@@ -36,11 +60,7 @@ function MyAppointment() {
               </button>
               <button
                 className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border mt-1 border-gray-400 hover:bg-red-600 hover:text-white transition-all duration-300"
-                onClick={() => {
-                  const updated = appointments.filter((_, i) => i !== index);
-                  localStorage.setItem("appointments", JSON.stringify(updated));
-                  setAppointments(updated);
-                }}
+                onClick={() => handleCancel(item.id)}
               >
                 Cancel appointment
               </button>

@@ -67,37 +67,50 @@ function Appointment() {
     useEffect(() => {
         console.log(docSlot)
     }, [docSlot])
-    const handleBooking = () => {
+    const handleBooking = async () => {
         const user = JSON.parse(localStorage.getItem("loggedInUser"));
         if (!user || !user.email) {
             alert("You must be logged in to book an appointment.");
             navigate("/login");
             return;
         }
+
         if (!slotTime) {
             alert("Please select a slot");
             return;
         }
+
         if (!docSlot[slotIndex] || !docSlot[slotIndex][0]) {
             alert("No slot selected");
             return;
         }
+
         const appointment = {
-            doctorId: docInfo._id,
+            userEmail: user.email,
             doctorName: docInfo.name,
             doctorImage: docInfo.image,
             date: docSlot[slotIndex][0].datetime.toDateString(),
             time: slotTime,
-            status: "unpaid", // You can also add status for payment
+            status: "unpaid",
         };
 
-        const existingAppointments = JSON.parse(localStorage.getItem("appointments")) || [];
-        existingAppointments.push(appointment);
-        localStorage.setItem("appointments", JSON.stringify(existingAppointments));
+        try {
+            const res = await fetch("http://localhost:8080/api/appointments", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(appointment),
+            });
 
-        alert("Appointment Booked!");
+            if (res.ok) {
+                alert("Appointment booked successfully!");
+            } else {
+                alert("Booking failed!");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error connecting to backend.");
+        }
     };
-
 
     return docInfo && (
         <>
