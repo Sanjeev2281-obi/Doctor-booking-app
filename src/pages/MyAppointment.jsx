@@ -3,12 +3,14 @@ import React, { useEffect, useState } from 'react';
 function MyAppointment() {
   const [appointments, setAppointments] = useState([]);
 
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
   const fetchAppointments = async () => {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
     if (!user || !user.email) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/api/appointments/${user.email}`);
+      const res = await fetch(`${API_BASE_URL}/api/appointments/${user.email}`);
       const data = await res.json();
       setAppointments(data);
     } catch (err) {
@@ -18,7 +20,7 @@ function MyAppointment() {
 
   const handleCancel = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/appointments/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/appointments/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
@@ -32,9 +34,6 @@ function MyAppointment() {
     }
   };
 
-  useEffect(() => {
-    fetchAppointments();
-  }, []);
 
   return (
     <div>
