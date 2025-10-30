@@ -4,7 +4,7 @@ function MyAppointment() {
   const [appointments, setAppointments] = useState([]);
 
   // Make sure this matches your .env variable
- const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
   // Fetch appointments for logged-in user
