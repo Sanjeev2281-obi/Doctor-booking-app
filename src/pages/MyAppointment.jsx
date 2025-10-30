@@ -47,7 +47,7 @@ function MyAppointment() {
 
       if (res.ok) {
         alert("Appointment cancelled!");
-        fetchAppointments(); // refresh list
+        fetchAppointments(); 
       } else {
         const msg = await res.text();
         console.error("Failed to cancel:", msg);
