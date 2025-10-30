@@ -4,7 +4,6 @@ function MyAppointment() {
   const [appointments, setAppointments] = useState([]);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-
   
   const fetchAppointments = async () => {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
@@ -34,6 +33,7 @@ function MyAppointment() {
     }
   };
 
+  // Cancel appointment
   const handleCancel = async (id) => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/appointments/${id}`, {
@@ -45,7 +45,7 @@ function MyAppointment() {
 
       if (res.ok) {
         alert("Appointment cancelled!");
-        fetchAppointments(); 
+        fetchAppointments();
       } else {
         const msg = await res.text();
         console.error("Failed to cancel:", msg);
@@ -59,8 +59,6 @@ function MyAppointment() {
   useEffect(() => {
     fetchAppointments();
   }, []);
-
-
   return (
     <div>
       <p className="pb-3 mt-12 font-medium text-zinc-700 border-b border-gray-300">My Appointment</p>
