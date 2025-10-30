@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 
 function MyAppointment() {
   const [appointments, setAppointments] = useState([]);
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  
+  // Direct deployed backend URL
+  const API_BASE_URL = "https://doctor-backend-5-2r6g.onrender.com";
+
+  // Fetch appointments for logged-in user
   const fetchAppointments = async () => {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
     if (!user || !user.email) {
@@ -30,6 +32,7 @@ function MyAppointment() {
       setAppointments(data);
     } catch (err) {
       console.error("Error fetching appointments:", err);
+      alert("Error connecting to backend.");
     }
   };
 
@@ -53,12 +56,14 @@ function MyAppointment() {
       }
     } catch (err) {
       console.error("Error cancelling appointment:", err);
+      alert("Error connecting to backend.");
     }
   };
 
   useEffect(() => {
     fetchAppointments();
   }, []);
+
   return (
     <div>
       <p className="pb-3 mt-12 font-medium text-zinc-700 border-b border-gray-300">My Appointment</p>
