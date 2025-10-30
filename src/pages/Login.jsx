@@ -6,8 +6,8 @@ function Login() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  const API_BASE_URL = "https://doctor-backend-5-2r6g.onrender.com/api/auth";
-
+  const API_BASE_UR = "https://doctor-backend-5-2r6g.onrender.com/api/auth";
+  const API_BASE_URL = "http://localhost:8080/api/auth";
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -57,10 +57,13 @@ function Login() {
   return (
     <form className="min-h-[80vh] flex items-center" onSubmit={handleLogin}>
       <div className="flex flex-col gap-3 items-start p-8 m-auto min-w-[340px] sm:min-w-96 border border-gray-300 rounded-xl text-zinc-800 text-sm shadow-lg">
-        <p className="text-2xl font-semibold">{state === 'sign up' ? "Create Account" : "Login"}</p>
-        <p>Please {state === "sign up" ? "sign up" : "log in"} to book appointment</p>
+        <p className="text-2xl font-semibold">
+          {state === 'signup' ? "Create Account" : "Login"}
+        </p>
 
-        {state === "sign up" && (
+        <p>Please {state === "signup" ? "sign up" : "log in"} to book appointment</p>
+
+        {state === "signup" && (
           <div className="w-full">
             <p>Full Name</p>
             <input className="border border-zinc-400 rounded w-full p-2 mt-1"
@@ -93,13 +96,13 @@ function Login() {
         </div>
 
         <button type="submit" className="bg-blue-600 cursor-pointer text-white w-full p-2 mt-1 rounded text-base">
-          {state === 'sign up' ? "Create Account" : "Login"}
+          {state === 'signup' ? "Create Account" : "Login"}
         </button>
 
-        {state === "sign up" ? (
-          <p>Already have account? <span onClick={() => setState("Login")} className="text-blue-600 underline cursor-pointer">Login here</span></p>
+        {state === "signup" ? (
+          <p>Already have account? <span onClick={() => setState("login")} className="text-blue-600 underline cursor-pointer">Login here</span></p>
         ) : (
-          <p>Create a new account? <span onClick={() => setState("sign up")} className="text-blue-600 underline cursor-pointer">Click here</span></p>
+          <p>Create a new account? <span onClick={() => setState("signup")} className="text-blue-600 underline cursor-pointer">Click here</span></p>
         )}
       </div>
     </form>

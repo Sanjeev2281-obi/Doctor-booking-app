@@ -3,18 +3,36 @@ import React, { useEffect, useState } from 'react';
 function MyAppointment() {
   const [appointments, setAppointments] = useState([]);
 
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+  // Make sure this matches your .env variable
+ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
+
+  // Fetch appointments for logged-in user
   const fetchAppointments = async () => {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
-    if (!user || !user.email) return;
+    if (!user || !user.email) {
+      console.log("No logged-in user found");
+      return;
+    }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/appointments/${user.email}`);
+      const res = await fetch(`${API_BASE_URL}/api/appointments/${user.email}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
+
+      if (!res.ok) {
+        const msg = await res.text();
+        console.error("Failed to fetch appointments:", msg);
+        return;
+      }
+
       const data = await res.json();
       setAppointments(data);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching appointments:", err);
     }
   };
 
@@ -22,17 +40,27 @@ function MyAppointment() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/appointments/${id}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
       });
+
       if (res.ok) {
         alert("Appointment cancelled!");
         fetchAppointments(); // refresh list
       } else {
+        const msg = await res.text();
+        console.error("Failed to cancel:", msg);
         alert("Failed to cancel!");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error cancelling appointment:", err);
     }
   };
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
 
 
   return (
