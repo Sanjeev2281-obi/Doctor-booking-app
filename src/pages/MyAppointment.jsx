@@ -2,12 +2,10 @@ import React, { useEffect, useState } from 'react';
 
 function MyAppointment() {
   const [appointments, setAppointments] = useState([]);
-
-  // Make sure this matches your .env variable
- const API_BASE_URL = "https://doctor-backend-5-2r6g.onrender.com";//import.meta.env.VITE_API_BASE_URL
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
-  // Fetch appointments for logged-in user
+  
   const fetchAppointments = async () => {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
     if (!user || !user.email) {
