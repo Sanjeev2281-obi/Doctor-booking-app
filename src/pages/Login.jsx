@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 function Login() {
-  const [state, setState] = useState("sign up");
+  const [state, setState] = useState("signup");
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -10,49 +10,50 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
-      if (state === "sign up") {
-        const res = await fetch(`${API_BASE_URL}/signup`, {
+      let res;
+
+      if (state === "signup") {
+        if (!name || !email || !password) {
+          alert("Please fill all fields!");
+          return;
+        }
+
+        res = await fetch(`${API_BASE_URL}/signup`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, email, password }),
         });
-
-        if (!res.ok) {
-          const msg = await res.text();
-          alert(msg || "Signup failed");
+      } else {
+        if (!email || !password) {
+          alert("Please enter email and password!");
           return;
         }
 
-        const data = await res.json();
-        localStorage.setItem("loggedInUser", JSON.stringify(data));
-        alert("Account created successfully!");
-      } else {
-        const res = await fetch(`${API_BASE_URL}/login`, {
+        res = await fetch(`${API_BASE_URL}/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
         });
-
-        if (!res.ok) {
-          const msg = await res.text();
-          alert(msg || "Login failed");
-          return;
-        }
-
-        const data = await res.json();
-        localStorage.setItem("loggedInUser", JSON.stringify(data));
-        alert("Login successful!");
       }
 
+      const msg = await res.text();
+
+      if (!res.ok) {
+        alert(msg);
+        return;
+      }
+
+      const data = JSON.parse(msg);
+      localStorage.setItem("loggedInUser", JSON.stringify(data));
+
+      alert(state === "signup" ? "Account created successfully!" : "Login successful!");
       window.location.href = "/";
     } catch (err) {
       console.error("Error:", err);
       alert("Server error. Please try again later.");
     }
   };
-
   return (
     <form className="min-h-[80vh] flex items-center" onSubmit={handleLogin}>
       <div className="flex flex-col gap-3 items-start p-8 m-auto min-w-[340px] sm:min-w-96 border border-gray-300 rounded-xl text-zinc-800 text-sm shadow-lg">
