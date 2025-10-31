@@ -23,7 +23,7 @@ function Doctor() {
   },[doctors,speciality])
   return (
     <div>
-      <p className="text-gray-600">Browse through the doctors specialist.</p>
+      <p className="text-gray-600">Browse through the doctors specialist</p>
       <button className={`px-5 mt-2 py-2 border border-gray-600 rounded text-sm text-gray-600 transition-all sm:hidden ${filter?"bg-blue-600 text-white":""}`} onClick={()=>setFilter(prev=>!prev)}>Filter</button>
       <div className="flex flex-col sm:flex-row item-start mt-5">
         
