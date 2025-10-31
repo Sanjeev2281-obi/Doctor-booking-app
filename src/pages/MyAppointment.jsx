@@ -4,7 +4,7 @@ function MyAppointment() {
   const [appointments, setAppointments] = useState([]);
 
   // Direct deployed backend URL
-  const API_BASE_URL = "https://doctor-backend-5-2r6g.onrender.com";
+  const API_BASE_URL = "https://localhost:8080"//https://doctor-backend-5-2r6g.onrender.com";
 
   // Fetch appointments for logged-in user
   const fetchAppointments = async () => {
