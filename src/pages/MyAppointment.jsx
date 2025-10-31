@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 function MyAppointment() {
   const [appointments, setAppointments] = useState([]);
 
-  // Direct deployed backend URL
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
   
