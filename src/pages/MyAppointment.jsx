@@ -6,7 +6,7 @@ function MyAppointment() {
   // Direct deployed backend URL
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-  // Fetch appointments for logged-in user
+  
   const fetchAppointments = async () => {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
     if (!user || !user.email) {
