@@ -14,7 +14,7 @@ function Appointment() {
     const [slotTime, setSlotTime] = useState("")
     const [isAuthenticated, setIsAuthenticated] = useState(null);
     const navigate = useNavigate();
-
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const getAvailableSlots = () => {
 
 
@@ -95,7 +95,7 @@ function Appointment() {
         };
 
         try {
-            const res = await fetch("http://localhost:8080/api/appointments", {
+            const res = await fetch(`${API_BASE_URL}/api/appointments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(appointment),
