@@ -64,13 +64,10 @@ function Appointment() {
         console.log(docSlot)
     }, [docSlot])
 
-    const getLocalAppointments = () => {
-        return JSON.parse(localStorage.getItem("appointments") || "[]");
-    };
+    // LocalStorage helpers
+    const getLocalAppointments = () => JSON.parse(localStorage.getItem("appointments") || "[]");
+    const saveLocalAppointments = (appointments) => localStorage.setItem("appointments", JSON.stringify(appointments));
 
-    const saveLocalAppointments = (appointments) => {
-        localStorage.setItem("appointments", JSON.stringify(appointments));
-    };
 
     const handleBooking = async () => {
         const user = JSON.parse(localStorage.getItem("loggedInUser"));
@@ -108,12 +105,10 @@ function Appointment() {
                 body: JSON.stringify(appointment),
             });
 
-            // Check if backend responded successfully
             if (res.ok) {
                 alert("Appointment booked successfully on server!");
-                return; // Success, stop here
+                return;
             } else {
-                // Server responded with an error
                 const msg = await res.text();
                 console.warn("Server error:", msg);
                 throw new Error(msg);
@@ -129,6 +124,7 @@ function Appointment() {
             alert("Appointment saved locally (server offline). It will sync later when server is live.");
         }
     };
+
 
     return docInfo && (
         <>
