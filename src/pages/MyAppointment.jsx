@@ -2,60 +2,80 @@ import React, { useEffect, useState } from 'react';
 
 function MyAppointment() {
   const [appointments, setAppointments] = useState([]);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+  // Helper functions for localStorage fallback
+  const getLocalAppointments = () => {
+    return JSON.parse(localStorage.getItem("appointments") || "[]");
+  };
 
-  
+  const saveLocalAppointments = (appointments) => {
+    localStorage.setItem("appointments", JSON.stringify(appointments));
+  };
+
+  // Fetch appointments
   const fetchAppointments = async () => {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
     if (!user || !user.email) {
       console.log("No logged-in user found");
+      setAppointments([]);
       return;
     }
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/appointments/${user.email}`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
-      if (!res.ok) {
-        const msg = await res.text();
-        console.error("Failed to fetch appointments:", msg);
-        return;
-      }
+      if (!res.ok) throw new Error(await res.text());
 
       const data = await res.json();
       setAppointments(data);
+
+      // Optional: cache latest data locally
+      const localAppointments = getLocalAppointments();
+      const updatedLocal = localAppointments.filter(a => a.userEmail !== user.email).concat(data);
+      saveLocalAppointments(updatedLocal);
+
     } catch (err) {
-      console.error("Error fetching appointments:", err);
-      alert("Error connecting to backend.");
+      console.warn("Backend failed, loading local appointments", err);
+      // Fallback: load appointments from localStorage
+      const localAppointments = getLocalAppointments().filter(
+        (a) => a.userEmail === user.email
+      );
+      setAppointments(localAppointments);
     }
   };
 
   // Cancel appointment
   const handleCancel = async (id) => {
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (!user) return;
+
     try {
       const res = await fetch(`${API_BASE_URL}/api/appointments/${id}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       if (res.ok) {
         alert("Appointment cancelled!");
         fetchAppointments();
       } else {
-        const msg = await res.text();
-        console.error("Failed to cancel:", msg);
-        alert("Failed to cancel!");
+        throw new Error(await res.text());
       }
     } catch (err) {
-      console.error("Error cancelling appointment:", err);
-      alert("Error connecting to backend.");
+      console.warn("Backend failed, cancelling locally", err);
+
+      // Remove from localStorage
+      const localAppointments = getLocalAppointments().filter(
+        (a) => a.id !== id
+      );
+      saveLocalAppointments(localAppointments);
+      setAppointments(localAppointments);
+
+      alert("Appointment cancelled locally (server offline)");
     }
   };
 

@@ -7,53 +7,99 @@ function Login() {
   const [name, setName] = useState('');
 
   const API_BASE_URL = " https://my-backend-app-latest-1-7wbp.onrender.com/api/auth"//https://doctor-backend-5-2r6g.onrender.com/api/auth";
-  
+
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    // Basic validation
+    if (state === "signup" && (!name || !email || !password)) {
+      alert("Please fill all fields!");
+      return;
+    }
+    if (state === "login" && (!email || !password)) {
+      alert("Please enter email and password!");
+      return;
+    }
+
     try {
       let res;
 
       if (state === "signup") {
-        if (!name || !email || !password) {
-          alert("Please fill all fields!");
-          return;
+        // Try signup via backend
+        try {
+          res = await fetch(`${API_BASE_URL}/signup`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password }),
+          });
+
+          if (!res.ok) throw new Error(await res.text());
+
+          const data = await res.json();
+          // Save user in localStorage as fallback
+          let users = JSON.parse(localStorage.getItem("users") || "[]");
+          users.push(data);
+          localStorage.setItem("users", JSON.stringify(users));
+
+          localStorage.setItem("loggedInUser", JSON.stringify(data));
+          alert("Account created successfully!");
+          window.location.href = "/";
+        } catch (err) {
+          console.warn("Backend signup failed, using localStorage fallback:", err);
+
+          // Save user in localStorage only
+          let users = JSON.parse(localStorage.getItem("users") || "[]");
+          const existingUser = users.find(u => u.email === email);
+          if (existingUser) {
+            alert("User already exists locally!");
+            return;
+          }
+          const localUser = { name, email, password };
+          users.push(localUser);
+          localStorage.setItem("users", JSON.stringify(users));
+          localStorage.setItem("loggedInUser", JSON.stringify(localUser));
+          alert("Account created locally (server offline)!");
+          window.location.href = "/";
         }
 
-        res = await fetch(`${API_BASE_URL}/signup`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
-        });
       } else {
-        if (!email || !password) {
-          alert("Please enter email and password!");
-          return;
+        // Login
+        try {
+          res = await fetch(`${API_BASE_URL}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (!res.ok) throw new Error(await res.text());
+
+          const data = await res.json();
+          localStorage.setItem("loggedInUser", JSON.stringify(data));
+          alert("Login successful!");
+          window.location.href = "/";
+
+        } catch (err) {
+          console.warn("Backend login failed, trying localStorage:", err);
+
+          // Fallback: check localStorage users
+          let users = JSON.parse(localStorage.getItem("users") || "[]");
+          const localUser = users.find(u => u.email === email && u.password === password);
+          if (localUser) {
+            localStorage.setItem("loggedInUser", JSON.stringify(localUser));
+            alert("Login successful locally (server offline)!");
+            window.location.href = "/";
+          } else {
+            alert("Server offline and user not found locally!");
+          }
         }
-
-        res = await fetch(`${API_BASE_URL}/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
       }
 
-      const msg = await res.text();
-
-      if (!res.ok) {
-        alert(msg);
-        return;
-      }
-
-      const data = JSON.parse(msg);
-      localStorage.setItem("loggedInUser", JSON.stringify(data));
-
-      alert(state === "signup" ? "Account created successfully!" : "Login successful!");
-      window.location.href = "/";
     } catch (err) {
-      console.error("Error:", err);
-      alert("Server error. Please try again later.");
+      console.error("Unexpected Error:", err);
+      alert("Something went wrong. Please try again later.");
     }
   };
+
   return (
     <form className="min-h-[80vh] flex items-center" onSubmit={handleLogin}>
       <div className="flex flex-col gap-3 items-start p-8 m-auto min-w-[340px] sm:min-w-96 border border-gray-300 rounded-xl text-zinc-800 text-sm shadow-lg">
