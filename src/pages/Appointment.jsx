@@ -88,17 +88,15 @@ function Appointment() {
         }
 
         const appointment = {
-            id: Date.now(), // unique ID for localStorage fallback
             userEmail: user.email,
             doctorName: docInfo.name,
             doctorImage: docInfo.image,
-            date: docSlot[slotIndex][0].datetime.toDateString(),
+            date: docSlot[slotIndex][0].datetime.toDateString(), // send as string
             time: slotTime,
             status: "unpaid",
         };
 
         try {
-            // Try booking via backend first
             const res = await fetch(`${API_BASE_URL}/api/appointments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -107,22 +105,20 @@ function Appointment() {
 
             if (res.ok) {
                 alert("Appointment booked successfully on server!");
-                return;
             } else {
                 const msg = await res.text();
-                console.warn("Server error:", msg);
-                throw new Error(msg);
+                alert("Server error: " + msg); // Do not save locally automatically
+                return;
             }
         } catch (err) {
-            // Backend failed or unreachable — fallback to localStorage
-            console.warn("Backend unreachable, saving appointment locally", err);
-
+            // Network error fallback
+            console.warn("Server unreachable, saving locally", err);
             const localAppointments = getLocalAppointments();
             localAppointments.push(appointment);
             saveLocalAppointments(localAppointments);
-
-            alert("Appointment saved locally (server offline). It will sync later when server is live.");
+            alert("Appointment saved locally (server offline)");
         }
+
     };
 
 
