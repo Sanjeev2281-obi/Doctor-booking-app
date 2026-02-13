@@ -8,7 +8,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  const API_BASE_URL = "https://my-backend-app-latest-1-7wbp.onrender.com/api/auth";
+  const API_BASE_URL = "https://doctor-backend-5-2r6g.onrender.com/api/auth";//"https://my-backend-app-latest-1-7wbp.onrender.com/api/auth";
 
   const fetchWithTimeout = (url, options, timeout = 15000) => {
     return Promise.race([
