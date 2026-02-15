@@ -8,7 +8,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  const API_BASE_URL = "https://my-backend-app-latest-1-7wbp.onrender.com/api/auth"; // Update with your backend URL
+  const API_BASE_URL = "https://doctor-backend-5-2r6g.onrender.com"//"https://my-backend-app-latest-1-7wbp.onrender.com/api/auth"; // Update with your backend URL
 
   const fetchWithTimeout = (url, options, timeout = 15000) => {
     return Promise.race([
@@ -54,10 +54,12 @@ function Login() {
         throw new Error(errorText || "Something went wrong");
       }
 
-      const data = await res.json();
+       const data = await res.json();
 
-      // Store only JWT or user session (NOT password)
-      localStorage.setItem("token", data.token);
+// Store user info in localStorage for MyProfile
+   localStorage.setItem("token", data.token || "");  // optional if you use JWT
+   localStorage.setItem("loggedInUser", JSON.stringify(data));  // <- add this line
+
 
       setMessage(state === "signup"
         ? "Account created successfully!"

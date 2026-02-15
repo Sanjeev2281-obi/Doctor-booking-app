@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import assets from '../assets/assets';
 
 function MyProfile() {
   const [user, setUser] = useState({
@@ -12,19 +11,50 @@ function MyProfile() {
     dob: "",
   });
   const [isEdit, setIsEdit] = useState(false);
-
   useEffect(() => {
-    const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
-    if (loggedUser) {
-      setUser(prev => ({ ...prev, ...loggedUser }));
-    }
-  }, []);
+  const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (!loggedUser?.email) return;
 
-  const saveChanges = () => {
-    setIsEdit(false);
-    localStorage.setItem("loggedInUser", JSON.stringify(user));
+  fetch(`https://doctor-backend-5-2r6g.onrender.com/api/profile/${loggedUser.email}`)
+    .then(res => {
+      if (!res.ok) throw new Error("Profile not found");
+      return res.json();
+    })
+    .then(profileData => {
+      setUser(profileData);   // ✅ FULL PROFILE FROM DB
+    })
+    .catch(err => {
+      console.error(err);
+    });
+}, []);
+
+  const saveChanges = async () => {
+  setIsEdit(false);
+
+  try {
+    // Use email (or id if you prefer) to call backend
+    const res = await fetch(`https://doctor-backend-5-2r6g.onrender.com/api/profile/${user.email}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(user),
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(errorText || "Failed to update profile");
+    }
+
+    const updatedUser = await res.json();
+    // Update localStorage with fresh data
+    localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
+    setUser(updatedUser); // refresh UI
     alert("Profile updated successfully!");
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Error updating profile. Try again.");
+  }
+};
+
 
   return (
     <div className="max-lg flex flex-col gap-2 text-sm">
