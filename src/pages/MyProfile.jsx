@@ -11,49 +11,70 @@ function MyProfile() {
     dob: "",
   });
   const [isEdit, setIsEdit] = useState(false);
-  useEffect(() => {
+ useEffect(() => {
+  // 1️⃣ Load cached profile instantly
+  const localProfile = localStorage.getItem("profile");
+  if (localProfile) {
+    setUser(JSON.parse(localProfile));
+  }
+
+  // 2️⃣ Then try server
   const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
   if (!loggedUser?.email) return;
 
   fetch(`https://doctor-backend-5-2r6g.onrender.com/api/profile/${loggedUser.email}`)
     .then(res => {
-      if (!res.ok) throw new Error("Profile not found");
+      if (!res.ok) throw new Error("Server down");
       return res.json();
     })
     .then(profileData => {
-      setUser(profileData);   // ✅ FULL PROFILE FROM DB
+      setUser(profileData);
+      localStorage.setItem("profile", JSON.stringify(profileData));
     })
-    .catch(err => {
-      console.error(err);
+    .catch(() => {
+      console.warn("Server offline → using cached profile");
     });
 }, []);
-
   const saveChanges = async () => {
   setIsEdit(false);
 
+  // ✅ always save locally first
+  localStorage.setItem("profile", JSON.stringify(user));
+
   try {
-    // Use email (or id if you prefer) to call backend
-    const res = await fetch(`https://doctor-backend-5-2r6g.onrender.com/api/profile/${user.email}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(user),
-    });
+    const res = await fetch(
+      `https://doctor-backend-5-2r6g.onrender.com/api/profile/${user.email}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(user),
+      }
+    );
 
     if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(errorText || "Failed to update profile");
+      throw new Error("Server error");
     }
 
     const updatedUser = await res.json();
-    // Update localStorage with fresh data
+
+    // ✅ sync success
+    localStorage.setItem("profile", JSON.stringify(updatedUser));
     localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
-    setUser(updatedUser); // refresh UI
-    alert("Profile updated successfully!");
+    setUser(updatedUser);
+
+    alert("Profile saved to server ✅");
   } catch (err) {
-    console.error(err);
-    alert("Error updating profile. Try again.");
+    console.warn("Server offline → saved locally only", err);
+
+    const localProfile = localStorage.getItem("profile");
+    if (localProfile) {
+      setUser(JSON.parse(localProfile));
+    }
+
+    alert("Server offline. Changes saved locally ✅");
   }
 };
+
 
 
   return (
