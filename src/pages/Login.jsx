@@ -10,7 +10,7 @@ function Login() {
 
   const API_BASE_URL = "https://doctor-backend-5-2r6g.onrender.com/api/auth"//"https://my-backend-app-latest-1-7wbp.onrender.com/api/auth"; // Update with your backend URL
 
-  const fetchWithTimeout = (url, options, timeout = 15000) => {
+  const fetchWithTimeout = (url, options, timeout = 60000) => {
     return Promise.race([
       fetch(url, options),
       new Promise((_, reject) =>
