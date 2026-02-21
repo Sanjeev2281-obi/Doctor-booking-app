@@ -16,15 +16,12 @@ function Appointment() {
     const navigate = useNavigate();
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const getAvailableSlots = () => {
-
-
         setDocSlot([])
         let today = new Date()
         let allSlots = []
         for (let i = 0; i < 7; i++) {
             let currentDate = new Date(today)
             currentDate.setDate(currentDate.getDate() + i)
-
             let endTime = new Date(currentDate)
             endTime.setHours(21, 0, 0, 0)
 

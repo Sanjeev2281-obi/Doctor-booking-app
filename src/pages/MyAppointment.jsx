@@ -3,8 +3,6 @@ import React, { useEffect, useState } from 'react';
 function MyAppointment() {
   const [appointments, setAppointments] = useState([]);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-  // Helper functions for localStorage fallback
   const getLocalAppointments = () => {
     return JSON.parse(localStorage.getItem("appointments") || "[]");
   };
