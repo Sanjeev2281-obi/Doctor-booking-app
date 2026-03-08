@@ -11,35 +11,11 @@ function MyProfile() {
     dob: "",
   });
   const [isEdit, setIsEdit] = useState(false);
- useEffect(() => {
-  // 1️⃣ Load cached profile instantly
-  const localProfile = localStorage.getItem("profile");
-  if (localProfile) {
-    setUser(JSON.parse(localProfile));
-  }
-
-  // 2️⃣ Then try server
-  const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
-  if (!loggedUser?.email) return;
-
-  fetch(`https://doctor-backend-5-2r6g.onrender.com/api/profile/${loggedUser.email}`)
-    .then(res => {
-      if (!res.ok) throw new Error("Server down");
-      return res.json();
-    })
-    .then(profileData => {
-      setUser(profileData);
-      localStorage.setItem("profile", JSON.stringify(profileData));
-    })
-    .catch(() => {
-      console.warn("Server offline → using cached profile");
-    });
-}, []);
   const saveChanges = async () => {
   setIsEdit(false);
 
-  // ✅ always save locally first
-  localStorage.setItem("profile", JSON.stringify(user));
+  const cachedKey = `profile_${user.email}`;
+  localStorage.setItem(cachedKey, JSON.stringify(user)); // save per user
 
   try {
     const res = await fetch(
@@ -51,30 +27,43 @@ function MyProfile() {
       }
     );
 
-    if (!res.ok) {
-      throw new Error("Server error");
-    }
+    if (!res.ok) throw new Error("Server error");
 
     const updatedUser = await res.json();
-
-    // ✅ sync success
-    localStorage.setItem("profile", JSON.stringify(updatedUser));
+    localStorage.setItem(cachedKey, JSON.stringify(updatedUser));
     localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
     setUser(updatedUser);
 
-    alert("Profile saved to server ✅");
+    alert("Profile saved ✅");
   } catch (err) {
     console.warn("Server offline → saved locally only", err);
-
-    const localProfile = localStorage.getItem("profile");
-    if (localProfile) {
-      setUser(JSON.parse(localProfile));
-    }
-
     alert("Server offline. Changes saved locally ✅");
   }
 };
+ useEffect(() => {
+  const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (!loggedUser?.email) return;
 
+  // Load cache only for THIS user
+  const cachedKey = `profile_${loggedUser.email}`;
+  const localProfile = localStorage.getItem(cachedKey);
+  if (localProfile) {
+    setUser(JSON.parse(localProfile));
+  }
+
+  fetch(`https://doctor-backend-5-2r6g.onrender.com/api/profile/${loggedUser.email}`)
+    .then(res => {
+      if (!res.ok) throw new Error("Server down");
+      return res.json();
+    })
+    .then(profileData => {
+      setUser(profileData);
+      localStorage.setItem(cachedKey, JSON.stringify(profileData)); // save per user
+    })
+    .catch(() => {
+      console.warn("Server offline → using cached profile");
+    });
+}, []);
 
 
   return (

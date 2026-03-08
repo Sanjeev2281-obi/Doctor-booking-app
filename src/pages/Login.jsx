@@ -56,8 +56,9 @@ function Login() {
 
        const data = await res.json();
 
-// Store user info in localStorage for MyProfile
-   localStorage.setItem("token", data.token || "");  // optional if you use JWT
+
+   localStorage.setItem("token", data.token || "");  
+   localStorage.removeItem("profile"); 
    localStorage.setItem("loggedInUser", JSON.stringify(data));  // <- add this line
 
 
