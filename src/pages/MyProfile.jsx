@@ -1,69 +1,72 @@
 import React, { useEffect, useState } from 'react';
 
 function MyProfile() {
+  const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
   const [user, setUser] = useState({
     name: "",
-    email: "",
+    email: loggedUser?.email || "",  // ← fix 1: set email immediately
     phone: "",
     address: { line1: "", line2: "" },
-    image:"https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg",
+    image: "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg",
     gender: "Male",
     dob: "",
   });
+
   const [isEdit, setIsEdit] = useState(false);
+
   const saveChanges = async () => {
-  setIsEdit(false);
+    setIsEdit(false);
 
-  const cachedKey = `profile_${user.email}`;
-  localStorage.setItem(cachedKey, JSON.stringify(user)); // save per user
+    const cachedKey = `profile_${user.email}`;
+    localStorage.setItem(cachedKey, JSON.stringify(user));
 
-  try {
-    const res = await fetch(
-      `https://doctor-backend-5-2r6g.onrender.com/api/profile/${user.email}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(user),
-      }
-    );
+    try {
+      const res = await fetch(
+        `https://doctor-backend-5-2r6g.onrender.com/api/profile/${encodeURIComponent(user.email)}`,  // ← fix 2: encode email
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+        }
+      );
 
-    if (!res.ok) throw new Error("Server error");
+      if (!res.ok) throw new Error("Server error");
 
-    const updatedUser = await res.json();
-    localStorage.setItem(cachedKey, JSON.stringify(updatedUser));
-    localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
-    setUser(updatedUser);
+      const updatedUser = await res.json();
+      localStorage.setItem(cachedKey, JSON.stringify(updatedUser));
+      localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
+      setUser(updatedUser);
 
-    alert("Profile saved ✅");
-  } catch (err) {
-    console.warn("Server offline → saved locally only", err);
-    alert("Server offline. Changes saved locally ✅");
-  }
-};
- useEffect(() => {
-  const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
-  if (!loggedUser?.email) return;
+      alert("Profile saved ✅");
+    } catch (err) {
+      console.warn("Server offline → saved locally only", err);
+      alert("Server offline. Changes saved locally ✅");
+    }
+  };
 
-  // Load cache only for THIS user
-  const cachedKey = `profile_${loggedUser.email}`;
-  const localProfile = localStorage.getItem(cachedKey);
-  if (localProfile) {
-    setUser(JSON.parse(localProfile));
-  }
+  useEffect(() => {
+    if (!loggedUser?.email) return;
 
-  fetch(`https://doctor-backend-5-2r6g.onrender.com/api/profile/${loggedUser.email}`)
-    .then(res => {
-      if (!res.ok) throw new Error("Server down");
-      return res.json();
-    })
-    .then(profileData => {
-      setUser(profileData);
-      localStorage.setItem(cachedKey, JSON.stringify(profileData)); // save per user
-    })
-    .catch(() => {
-      console.warn("Server offline → using cached profile");
-    });
-}, []);
+    const cachedKey = `profile_${loggedUser.email}`;
+    const localProfile = localStorage.getItem(cachedKey);
+    if (localProfile) {
+      setUser(JSON.parse(localProfile));
+    }
+
+    fetch(`https://doctor-backend-5-2r6g.onrender.com/api/profile/${encodeURIComponent(loggedUser.email)}`)  // ← fix 3: encode email
+      .then(res => {
+        if (!res.ok) throw new Error("Server down");
+        return res.json();
+      })
+      .then(profileData => {
+        setUser(profileData);
+        localStorage.setItem(cachedKey, JSON.stringify(profileData));
+      })
+      .catch(() => {
+        console.warn("Server offline → using cached profile");
+      });
+  }, []);
 
 
   return (
