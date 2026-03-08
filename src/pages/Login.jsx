@@ -72,9 +72,18 @@ function Login() {
       }, 1500);
 
     } catch (err) {
-      console.error(err);
-      setMessage("Server is waking up or unavailable. Please try again in a few seconds.");
-    } finally {
+  console.error(err);
+
+  if (err.message.includes("Email already exists")) {
+    alert("This email is already registered. Please login instead.");
+  } 
+  else if (err.message.includes("Invalid credentials")) {
+    alert("Wrong email or password.");
+  }
+  else {
+    setMessage(err.message || "Server unavailable. Please try again.");
+  }
+}finally {
       setLoading(false);
     }
   };
