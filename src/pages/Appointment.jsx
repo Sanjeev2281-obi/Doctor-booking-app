@@ -102,6 +102,7 @@ function Appointment() {
 
             if (res.ok) {
                 alert("Appointment booked successfully on server!");
+                 navigate("/my-appointment");
             } else {
                 const msg = await res.text();
                 alert("Server error: " + msg); // Do not save locally automatically

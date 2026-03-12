@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 function MyProfile() {
+
+  const API_BASE_URL = "https://doctor-backend-5-2r6g.onrender.com";
   const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
   const [user, setUser] = useState({
@@ -22,8 +24,7 @@ function MyProfile() {
     localStorage.setItem(cachedKey, JSON.stringify(user));
 
     try {
-      const res = await fetch(
-        `https://doctor-backend-5-2r6g.onrender.com/api/profile/${encodeURIComponent(user.email)}`,  // ← fix 2: encode email
+      const res = await fetch(`${API_BASE_URL}/api/profile/${encodeURIComponent(user.email)}`,  // ← fix 2: encode email
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -54,7 +55,7 @@ function MyProfile() {
       setUser(JSON.parse(localProfile));
     }
 
-    fetch(`https://doctor-backend-5-2r6g.onrender.com/api/profile/${encodeURIComponent(loggedUser.email)}`)  // ← fix 3: encode email
+    fetch(`${API_BASE_URL}/api/profile/${encodeURIComponent(loggedUser.email)}`) // ← fix 3: encode email
       .then(res => {
         if (!res.ok) throw new Error("Server down");
         return res.json();
