@@ -292,7 +292,7 @@ function MyAppointment() {
   const [showPayment, setShowPayment] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
+  const isPaid = item.paymentStatus?.toUpperCase() === "PAID";
   const getLocalAppointments = () => JSON.parse(localStorage.getItem("appointments") || "[]");
   const saveLocalAppointments = (appointments) => localStorage.setItem("appointments", JSON.stringify(appointments));
 
@@ -370,55 +370,59 @@ function MyAppointment() {
       {appointments.length === 0 ? (
         <p className="text-sm text-gray-600 mt-4">No appointments booked yet.</p>
       ) : (
-        appointments.map((item) => (
-          <div key={item.id} className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b border-gray-300">
-            <div>
-              <img className="bg-indigo-50 w-32" src={item.doctorImage} alt="" />
+        appointments.map((item) => {
+          const isPaid = item.paymentStatus?.toUpperCase() === "PAID";
+
+          return (
+            <div key={item.id} className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b border-gray-300">
+              <div>
+                <img className="bg-indigo-50 w-32" src={item.doctorImage} alt="" />
+              </div>
+              <div className="flex-1 text-sm text-zinc-700">
+                <p className="text-neutral-800 font-semibold">{item.doctorName}</p>
+                <p className="text-sm">Appointment Booked</p>
+                <p className="text-neutral-800 font-semibold mt-1">Date & Time:</p>
+                <p className="text-xs mt-1">{item.date} | {item.time}</p>
+              </div>
+              <div className="flex flex-col justify-end">
+                <button
+                  style={{
+                    background: isPaid ? "#16a34a" : "#2563eb",
+                    color: "white",
+                    padding: "8px 14px",
+                    borderRadius: "6px",
+                    border: "none"
+                  }}
+                  onClick={() => {
+                    setSelectedAppointment(item);
+                    setShowPayment(true);
+                  }}
+                  disabled={isPaid}
+                >
+                  {isPaid ? "Paid ✅" : "Pay Online"}
+                </button>
+                <button
+                  className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border mt-1 border-gray-400 hover:bg-red-600 hover:text-white transition-all duration-300"
+                  onClick={() => handleCancel(item.id)}
+                >
+                  Cancel appointment
+                </button>
+              </div>
             </div>
-            <div className="flex-1 text-sm text-zinc-700">
-              <p className="text-neutral-800 font-semibold">{item.doctorName}</p>
-              <p className="text-sm">Appointment Booked</p>
-              <p className="text-neutral-800 font-semibold mt-1">Date & Time:</p>
-              <p className="text-xs mt-1">{item.date} | {item.time}</p>
-            </div>
-            <div className="flex flex-col justify-end">
-             <button
-  style={{
-    background: item.paymentStatus.toUpperCase() === "PAID" ? "#16a34a" : "#2563eb",
-    color: "white",
-    padding: "8px 14px",
-    borderRadius: "6px",
-    border: "none"
-  }}
-  onClick={() => {
-    setSelectedAppointment(item);
-    setShowPayment(true);
-  }}
-  disabled={item.paymentStatus.toUpperCase() === "PAID"}
->
-  {item.paymentStatus.toUpperCase() === "PAID" ? "Paid ✅" : "Pay Online"}
-</button>
-              <button
-                className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border mt-1 border-gray-400 hover:bg-red-600 hover:text-white transition-all duration-300"
-                onClick={() => handleCancel(item.id)}
-              >
-                Cancel appointment
-              </button>
-            </div>
-          </div>
-        ))
+          );
+        })
       )}
 
-      {showPayment && (
-  <PaymentModal
-    appointment={selectedAppointment}
-    onClose={() => {
-      setShowPayment(false);
-      setSelectedAppointment(null);
-    }}
-    onSuccess={handlePaymentSuccess}
-  />
-)}
+      {showPayment && selectedAppointment && (
+        <PaymentModal
+          appointment={selectedAppointment}
+          onClose={() => {
+            setShowPayment(false);
+            setSelectedAppointment(null);
+          }}
+          onSuccess={handlePaymentSuccess}
+        />
+      )}
     </div>
   );
 }
