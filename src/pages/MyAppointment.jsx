@@ -292,7 +292,7 @@ function MyAppointment() {
   const [showPayment, setShowPayment] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  const isPaid = item.paymentStatus?.toUpperCase() === "PAID";
+ 
   const getLocalAppointments = () => JSON.parse(localStorage.getItem("appointments") || "[]");
   const saveLocalAppointments = (appointments) => localStorage.setItem("appointments", JSON.stringify(appointments));
 
