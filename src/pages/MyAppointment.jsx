@@ -382,8 +382,9 @@ function MyAppointment() {
               <p className="text-xs mt-1">{item.date} | {item.time}</p>
             </div>
             <div className="flex flex-col justify-end">
-            <button style={{
-    background: item.paymentStatus === "PAID" ? "#16a34a" : "#2563eb",
+             <button
+  style={{
+    background: item.paymentStatus.toUpperCase() === "PAID" ? "#16a34a" : "#2563eb",
     color: "white",
     padding: "8px 14px",
     borderRadius: "6px",
@@ -393,9 +394,9 @@ function MyAppointment() {
     setSelectedAppointment(item);
     setShowPayment(true);
   }}
-  disabled={item.paymentStatus === "PAID"}
+  disabled={item.paymentStatus.toUpperCase() === "PAID"}
 >
-  {item.paymentStatus === "PAID" ? "Paid ✅" : "Pay Online"}
+  {item.paymentStatus.toUpperCase() === "PAID" ? "Paid ✅" : "Pay Online"}
 </button>
               <button
                 className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border mt-1 border-gray-400 hover:bg-red-600 hover:text-white transition-all duration-300"
